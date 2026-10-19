@@ -23,4 +23,4 @@ Make sure you have a C compiler installed, such as GCC.
 Compile the project:
 
 ```bash
-gcc -o tsundere-shell *.c
+gcc -Wall -Wextra -Iinclude src/main.c src/shell.c -o my_shell
