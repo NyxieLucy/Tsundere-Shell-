@@ -1,36 +1,32 @@
+#include "../include/shell.h"
+#include <stdbool.h>
 #include <stdio.h>
+
 #include <stdlib.h>
-#include <string.h>
-#include <sys/wait.h>
 #include <unistd.h>
+int main(int argc, char *argv[]) {
+  (void)argc;
+  (void)argv;
+  char *line;
 
-// TO DO: FIX THIS TRASHY NONSENSE
-int main() {
-  char *line = NULL;
-  size_t len = 0;
-  ssize_t read;
-  printf("enter your statement: \n");
-  read = getline(&line, &len, stdin);
-
-  if (read != -1) {
-    line[strcspn(line, "\n")] = '\0';
-    pid_t pid = fork();
-    if (pid == 0) {
-      char *args[] = {line, NULL};
-      if (execvp(args[0], args) == -1) {
-        perror("exec error!");
-        exit(1);
-      }
-    } else if (pid > 0) {
-      int status;
-      waitpid(pid, &status, 0);
-      printf("done");
+  char **args;
+  int status;
+  int interractivity = isatty(STDIN_FILENO);
+  do {
+    if (interractivity) {
+      printf("( ˶ˆ꒳ˆ˵ )>");
+      fflush(stdout);
     }
-  }
-
-  printf("\n there, i executed your dumb command, hmpf!\n");
-  printf("\n(⸝⸝¬`‸´¬⸝⸝)~ ");
-  free(line);
-
-  return 0;
+    line = readline();
+    if (line == NULL) {
+      break;
+    }
+    args = parse_line(line);
+    if (args != NULL) {
+      status = execute_command(args);
+    }
+    free(line);
+    free(args);
+  } while (status);
+  return EXIT_SUCCESS;
 }
